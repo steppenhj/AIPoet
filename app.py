@@ -11,9 +11,18 @@ import pandas as pd
 # LangChain / OpenAI
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 try:
+    # ✅ langchain-community 0.3.x 권장 경로
     from langchain_community.document_loaders import PyPDFLoader
+    PDF_LOADER_NAME = "PyPDFLoader (top-level)"
 except ModuleNotFoundError:
-    from langchain_community.document_loaders.pdf import PyPDFLoader
+    try:
+        # 일부 구버전/변형 빌드
+        from langchain_community.document_loaders.pdf import PyPDFLoader
+        PDF_LOADER_NAME = "PyPDFLoader (.pdf submodule)"
+    except ModuleNotFoundError:
+        # 최후 폴백: pdfplumber 기반 로더 사용 (requirements에 pdfplumber 필요)
+        from langchain_community.document_loaders import PDFPlumberLoader as PyPDFLoader
+        PDF_LOADER_NAME = "PDFPlumberLoader (fallback)"
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate
